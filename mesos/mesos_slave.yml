@@ -1,0 +1,39 @@
+---
+- hosts: 10.10.10.106
+  remote_user: root
+  tasks: 
+    - name: Install rpm centos 7
+      copy: src=templates/mesos7.repo dest=/etc/yum.repos.d/mesos7.repo 
+      when: ansible_distribution_major_version == "7"
+    - name: Install rpm centos 6
+      shell: rpm -Uvh http://repos.mesosphere.io/el/6/noarch/RPMS/mesosphere-el-repo-6-2.noarch.rpm
+      when: ansible_distribution_major_version == "6"
+      tags:
+        - lookyum  
+    - name: Install memsos
+      yum: name="mesos-0.25*" state=present 
+    - name: copy zk file
+      template: src=templates/zk dest=/etc/mesos/zk backup=yes  
+      tags:
+        - cpmesos
+    - name: copy mesos file 
+      template: src=templates/mesos dest=/etc/default/mesos backup=yes
+      tags: 
+        - cpmesos
+    - name: copy mesos-slave file   
+      template: src=templates/mesos-slave dest=/etc/default/mesos-slave backup=yes 
+      tags: 
+        - cpmesos
+      notify: 
+        - restart mesos
+        
+    - name: Starting mesos service 
+      service: name=mesos-slave enabled=true state=started
+    - name: copy init mesos
+      copy: src=templates/start-mesos.sh dest=/home/cmsgroup/ owner=cmsgroup group=cmsgroup mode=0755
+      tags: 
+        - start-mesos   
+  handlers: 
+    - name: restart mesos
+      service: name=mesos-slave state=restarted 
+       
