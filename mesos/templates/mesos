@@ -1,0 +1,4 @@
+LOGS=/var/log/mesos
+ULIMIT="-n 8192"
+MESOS_IP={{ ansible_default_ipv4.address }}
+MESOS_HOSTNAME={{ ansible_default_ipv4.address }}

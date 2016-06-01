@@ -1,0 +1,2 @@
+MASTER=`cat /etc/mesos/zk`
+MESOS_attributes=web:web-{{ ansible_default_ipv4.address.split(".")[-1] }}
